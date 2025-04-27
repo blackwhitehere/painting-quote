@@ -106,9 +106,26 @@ export function SquareMetersQuestion({
   showPrevious,
   validationError
 }: { 
-  value: number; 
+  value: number | null; 
   onChange: (value: number) => void; 
 } & CommonQuestionProps) {
+  const [inputValue, setInputValue] = useState<string>(value !== null ? value.toString() : '');
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
+    // Only update parent state if it's a valid number or empty string
+    if (newValue === '') {
+      onChange(0);
+    } else {
+      const parsed = parseInt(newValue);
+      if (!isNaN(parsed)) {
+        onChange(parsed);
+      }
+    }
+  };
+  
   return (
     <div className="mb-6">
       <label htmlFor="squareMeters" className="block mb-2 text-lg font-medium">
@@ -124,8 +141,8 @@ export function SquareMetersQuestion({
             id="squareMeters"
             type="number"
             min="0"
-            value={value || ''}
-            onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+            value={inputValue}
+            onChange={handleChange}
             className="w-full p-3 outline-none"
           />
         </div>
@@ -146,7 +163,7 @@ export function SquareMetersQuestion({
         
         <Button 
           onClick={onNext} 
-          disabled={value <= 0}
+          disabled={value === null || value < 0}
           variant="primary"
           icon={<ChevronRight className="size-4" />}
         >
@@ -173,6 +190,37 @@ export function DoorsWindowsQuestion({
   onDoorsChange: (value: number) => void; 
   onWindowsChange: (value: number) => void; 
 } & CommonQuestionProps) {
+  const [doorsInput, setDoorsInput] = useState<string>(doors !== null ? doors.toString() : '');
+  const [windowsInput, setWindowsInput] = useState<string>(windows !== null ? windows.toString() : '');
+  
+  const handleDoorsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setDoorsInput(newValue);
+    
+    if (newValue === '') {
+      onDoorsChange(0);
+    } else {
+      const parsed = parseInt(newValue);
+      if (!isNaN(parsed)) {
+        onDoorsChange(parsed);
+      }
+    }
+  };
+  
+  const handleWindowsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setWindowsInput(newValue);
+    
+    if (newValue === '') {
+      onWindowsChange(0);
+    } else {
+      const parsed = parseInt(newValue);
+      if (!isNaN(parsed)) {
+        onWindowsChange(parsed);
+      }
+    }
+  };
+  
   return (
     <div className="mb-6">
       <div className="mb-4">
@@ -187,8 +235,8 @@ export function DoorsWindowsQuestion({
             id="doors"
             type="number"
             min="0"
-            value={doors === null ? '' : doors}
-            onChange={(e) => onDoorsChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+            value={doorsInput}
+            onChange={handleDoorsChange}
             className="w-full p-3 outline-none"
           />
         </div>
@@ -206,8 +254,8 @@ export function DoorsWindowsQuestion({
             id="windows"
             type="number"
             min="0"
-            value={windows === null ? '' : windows}
-            onChange={(e) => onWindowsChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+            value={windowsInput}
+            onChange={handleWindowsChange}
             className="w-full p-3 outline-none"
           />
         </div>
